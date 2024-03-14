@@ -1,5 +1,6 @@
 public class HashMap<K,V> implements Hash<K,V>{
     Node<K,V>[] table;
+    Node<K,V>[] newTable;
     int size;
     final float DEFAULT_LOAD_FACTOR = 0.75f;
     HashMap(){
@@ -9,6 +10,9 @@ public class HashMap<K,V> implements Hash<K,V>{
 
     public void put(K key, V value){
         int hash = key.hashCode();
+        if (hash == 0) {
+            throw new IllegalArgumentException("Key must have a non-zero hash code.");
+        }
         int tableIndex = hash % table.length;
         Node<K,V> current = table[tableIndex];
         // проверочка на коолизию
@@ -23,7 +27,7 @@ public class HashMap<K,V> implements Hash<K,V>{
         }
         // вставка на первую позицию со сдвигом
         if(DEFAULT_LOAD_FACTOR*table.length < size){
-            resize();
+            resize(table.length*2);
         }
         Node<K,V> newNode = new Node<>(key,value,hash);
         newNode.next = table[tableIndex];
@@ -31,9 +35,8 @@ public class HashMap<K,V> implements Hash<K,V>{
         size++;
 
     }
-    private void resize(){
-        int newLength = table.length*2;
-        Node<K,V>[] newTable = new Node[newLength];
+    private void resize(int newLength){
+        newTable = new Node[newLength];
         for(Node<K,V> sus : table){
             //Тут как бы надо все поменять емае
             while(sus != null){
@@ -105,6 +108,9 @@ public class HashMap<K,V> implements Hash<K,V>{
             }
             prev = current;
             current = current.next;
+        }
+        if(DEFAULT_LOAD_FACTOR*table.length > size){
+            resize((int)(table.length/1.5));
         }
         // Если ключ не найден
         return null;
