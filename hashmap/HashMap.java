@@ -2,7 +2,7 @@ public class HashMap<K,V> implements Hash<K,V>{
     Node<K,V>[] table;
     Node<K,V>[] newTable;
     int size;
-    final float DEFAULT_LOAD_FACTOR = 0.75f;
+    float DEFAULT_LOAD_FACTOR = 0.75f;
     HashMap(){
         this.table = new Node[4];
         this.size = 0;
@@ -15,6 +15,7 @@ public class HashMap<K,V> implements Hash<K,V>{
         }
         int tableIndex = hash % table.length;
         Node<K,V> current = table[tableIndex];
+        int count = 0;
         // проверочка на коолизию
         while(current != null){
             if(hash == current.getKey().hashCode()){ // проверка на хэшкод ёпта
@@ -23,12 +24,13 @@ public class HashMap<K,V> implements Hash<K,V>{
                     return;
                 }
             }
+            count++;
             current = current.next;
         }
-        // вставка на первую позицию со сдвигом
-        if(DEFAULT_LOAD_FACTOR*table.length < size){
+        if(count >= table.length){
             resize(table.length*2);
         }
+        // вставка на первую позицию со сдвигом
         Node<K,V> newNode = new Node<>(key,value,hash);
         newNode.next = table[tableIndex];
         table[tableIndex] = newNode;
@@ -95,6 +97,7 @@ public class HashMap<K,V> implements Hash<K,V>{
         int indexTable = hash % table.length;
         Node<K, V> current = table[indexTable];
         Node<K, V> prev = null;
+        int count = 0;
         while (current != null) {
             if (current.getKey().hashCode() == hash) {
                 if (prev == null) {//если первый элемент
@@ -106,6 +109,7 @@ public class HashMap<K,V> implements Hash<K,V>{
                 return current.getValue();
             }
             prev = current;
+            count++;
             current = current.next;
         }
         if(DEFAULT_LOAD_FACTOR*table.length > size){
