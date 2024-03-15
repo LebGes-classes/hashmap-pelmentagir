@@ -75,17 +75,16 @@ public class HashMap<K,V> implements Hash<K,V>{
         }
         return false;
     }
+    @Override
     public boolean containsValue(V value){
-        int hash = value.hashCode();
-        int bucketIndex = hash % table.length;
-
-        Node<K ,V> current = table[bucketIndex];
-
-        while (current != null){
-            if(current.getValue().equals(value)){
-                return true;
+        Node<K ,V>[] current = table;
+        for (Node<K, V> node : current) {
+            while (node != null) {
+                if (node.getValue().equals(value)) {
+                    return true;
+                }
+                node = node.next;
             }
-            current = current.next;
         }
         return false;
     }
@@ -121,21 +120,26 @@ public class HashMap<K,V> implements Hash<K,V>{
     }
     @Override
     public void clear() {
-        table = null;
+        table = new Node[4];
+        size = 0;
     }
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("{");
-        for (Node<K, V> kvNode : table) {
-            Node<K, V> node = kvNode;
+        StringBuilder stringBuilder = new StringBuilder("{");
+        for (Node<K, V> node : table) {
             while (node != null) {
-                sb.append(node.getKey()).append("=").append(node.getValue());
+                stringBuilder.append(node.getKey()).append("=").append(node.getValue());
                 if (node.next != null) {
-                    sb.append(", ");
+                    stringBuilder.append(", ");
                 }
                 node = node.next;
             }
         }
-        sb.append("}");
-        return sb.toString();
+        if (stringBuilder.length() > 1) {
+            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+        }
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
+
 }
